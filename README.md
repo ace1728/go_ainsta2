@@ -176,14 +176,13 @@ An HTTP JSON API capable of the following operations, <br>
  &nbsp;&nbsp; -[] URL should be ‘/posts/users/<Id here>'<br><br>
 
 <h3> All the above listed operations have been completed and work smoothly . </h3>
-<h4> <b> The following were not completed. </b>
+<h4> <strong> The following were not completed. </strong> </h4>
 <ol>
 <li> Adding pagination </li>
 <li> Adding test cases </li>
-
+</ol>
 <!-- CONTACT -->
 ## Contact
-
 Your Name - [Khyati Chaturvedi](https://www.linkedin.com/in/khyati-chaturvedi-a7b1371b1/) - khyati.chaturvedi2019@vitstudent.ac.in<br>
 
 Project Link: [https://github.com/ace1728/go_ainsta2](https://github.com/ace1728/go_ainsta2)<br>
