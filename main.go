@@ -40,25 +40,6 @@ func encrypt(data []byte, passphrase string) []byte {
 	return ciphertext
 }
 
-func decrypt(data []byte, passphrase string) []byte {
-	key := []byte(createHash(passphrase))
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err.Error())
-	}
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		panic(err.Error())
-	}
-	nonceSize := gcm.NonceSize()
-	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-	return plaintext
-}
-
 type User struct {
 	Name     string             `json:"name,omitempty" bson:"name,omitempty"`
 	Id       primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
@@ -89,7 +70,7 @@ func (h *userHandlers) users(w http.ResponseWriter, r *http.Request) {
 func (h *userHandlers) get(w http.ResponseWriter, r *http.Request) {
 	r.Header.Add("content", "application/json")
 	var users []User
-	collection := client.Database("test").Collection("users")
+	collection := client.Database("goainsta").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
@@ -101,7 +82,6 @@ func (h *userHandlers) get(w http.ResponseWriter, r *http.Request) {
 	for cursor.Next(ctx) {
 		var user User
 		cursor.Decode(&user)
-		user.Password = string(decrypt([]byte(user.Password), "password"))
 		users = append(users, user)
 	}
 	if err := cursor.Err(); err != nil {
@@ -120,7 +100,7 @@ func (h *userHandlers) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 	id, _ := primitive.ObjectIDFromHex(parts[2])
 	var user User
-	collection := client.Database("test").Collection("users")
+	collection := client.Database("goainsta").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err := collection.FindOne(ctx, User{Id: id}).Decode(&user)
 	if err != nil {
@@ -134,7 +114,7 @@ func (h *userHandlers) post(w http.ResponseWriter, r *http.Request) {
 	r.Header.Add("content", "application/json")
 	var user User
 	json.NewDecoder(r.Body).Decode(&user)
-	collection := client.Database("test").Collection("users")
+	collection := client.Database("goainsta").Collection("users")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	user.Password = string(encrypt([]byte(user.Password), "password"))
 	result, _ := collection.InsertOne(ctx, user)
@@ -176,7 +156,7 @@ func (h *postHandlers) posts(w http.ResponseWriter, r *http.Request) {
 func (h *postHandlers) getp(w http.ResponseWriter, r *http.Request) {
 	r.Header.Add("content", "application/json")
 	var posts []Post
-	collection := client.Database("test").Collection("posts")
+	collection := client.Database("goainsta").Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
@@ -206,7 +186,7 @@ func (h *postHandlers) getPost(w http.ResponseWriter, r *http.Request) {
 	}
 	id, _ := primitive.ObjectIDFromHex(parts[2])
 	var post Post
-	collection := client.Database("test").Collection("posts")
+	collection := client.Database("goainsta").Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err := collection.FindOne(ctx, User{Id: id}).Decode(&post)
 	if err != nil {
@@ -225,7 +205,7 @@ func (h *postHandlers) getPostuser(w http.ResponseWriter, r *http.Request) {
 	}
 	id := parts[3]
 	var posts []Post
-	collection := client.Database("test").Collection("posts")
+	collection := client.Database("goainsta").Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
@@ -253,7 +233,7 @@ func (h *postHandlers) postp(w http.ResponseWriter, r *http.Request) {
 	r.Header.Add("content", "application/json")
 	var post Post
 	json.NewDecoder(r.Body).Decode(&post)
-	collection := client.Database("test").Collection("posts")
+	collection := client.Database("goainsta").Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	post.Time = fmt.Sprintf(" %s", time.Unix(time.Now().Unix(), 0))
 	result, _ := collection.InsertOne(ctx, post)
